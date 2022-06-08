@@ -53,7 +53,8 @@ class Env:
         try:
             with open(self.config, 'r') as f:
                 data = json.loads(f.read())
-        except json.decoder.JSONDecodeError:
+        except (json.decoder.JSONDecodeError,
+                FileNotFoundError):
             data = []
 
         for item in data:
