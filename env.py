@@ -43,6 +43,13 @@ class Env:
             env_vars = [v for v in self.variables.values()]
         return [v.to_dict() for v in env_vars]
 
+    def to_dict(self, only_verbose=False):
+        if only_verbose:
+            env_vars = [v for v in self.variables.values() if v.verbose]
+        else:
+            env_vars = [v for v in self.variables.values()]
+        return {v.title: v.value for v in env_vars}
+
     def to_json(self, only_verbose=False, indent=4):
         return json.dumps(
             self.to_list(only_verbose),
