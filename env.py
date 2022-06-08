@@ -1,6 +1,6 @@
 import os
 import json
-from var import Var
+from .var import Var
 
 class Env:
     def __init__(self, path_to_config='env.json', milestone=None):
@@ -50,19 +50,20 @@ class Env:
         )
 
     def __update_config(self):
-        with open(self.config, 'w+') as f:
-            try:
+        try:
+            with open(self.config, 'r') as f:
                 data = json.loads(f.read())
-            except json.decoder.JSONDecodeError:
-                data = []
+        except json.decoder.JSONDecodeError:
+            data = []
 
-            for item in data:
-                var = Var(item)
+        for item in data:
+            var = Var(item)
+            self.variables[var.title] = var
+
+        for k, v in os.environ.items():
+            if not k in self.variables:
+                var = Var(title=k, added_at=self.milestone)
                 self.variables[var.title] = var
 
-            for k, v in os.environ.items():
-                if not k in self.variables:
-                    var = Var(title=k, added_at=self.milestone)
-                    self.variables[var.title] = var
-
+        with open(self.config, 'w') as f:
             f.write(self.to_json())
