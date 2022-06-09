@@ -21,6 +21,7 @@ class Var:
         self.verbose = self.__get_verbose(obj)
         self.added_at = self.__get_milestone(obj)
 
+        self.value
         self.__log()
 
     def __get_obj(self, *args, **kwargs):

@@ -13,7 +13,7 @@ class Env:
         try:
             return self.variables[title]
         except KeyError:
-            raise ValueError("Variable %s is not set" % title)
+            return None
 
     def __setitem__(self, title, value):
         try:
