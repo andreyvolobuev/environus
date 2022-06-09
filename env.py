@@ -37,6 +37,9 @@ class Env:
             path_to_config
         )
 
+    def get(self, var, default=None):
+        return self[var].get(default)
+
     def to_list(self, only_verbose=False):
         if only_verbose:
             env_vars = [v for v in self.variables.values() if v.verbose]

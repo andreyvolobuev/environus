@@ -60,12 +60,20 @@ class Var:
             return self.__cast_type(default)
         return default
 
+    def __bool_cast(self, value):
+        if value in ['0', 'false', 'False', 'null', 'None', '']:
+            return False
+        return bool(value)
+
     def __cast_type(self, value):
         try:
             type_ = getattr(builtins, self.type)
+            if type_ == bool:
+                return self.__bool_cast(value)
             return type_(value)
         except (ValueError, TypeError):
-            raise ValueError("Can't cast ENV: %s=%s (type: %s) to type %s" % (self.title, value, type(value), self.type))
+            raise ValueError("Can't cast ENV: %s = %s (type: %s) to type %s"
+                    % (self.title, value, type(value), self.type))
 
     def __get_description(self, obj):
         return obj.get('description')
@@ -81,7 +89,7 @@ class Var:
             print('[%s] ENV WARNING: %s is not described! '
                   'If you wish to mute this warning - set "verbose" property to False '
                   'or give the variable a description.' % (
-                      datetime.now().isoformat().replace("T", " "), self.title))
+                  datetime.now().isoformat().replace("T", " "), self.title))
 
     def to_dict(self):
         obj = {}
@@ -89,17 +97,20 @@ class Var:
             obj[k] = getattr(self, k)
         return obj
 
-    @property
-    def value(self):
+    def get(self, default=None):
         value = os.environ.get(self.title)
         if value is not None:
             return self.__cast_type(value)
-        if self.default is not None:
-            return self.__cast_type(self.default)
+        if default is not None:
+            return self.__cast_type(default)
         if self.required:
             raise ValueError("Environment variable %s is required "
                              "to be passed a value", self.title)
         return None
+
+    @property
+    def value(self):
+        return self.get()
 
     @value.setter
     def value(self, value):
