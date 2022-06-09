@@ -103,6 +103,8 @@ class Var:
             return self.__cast_type(value)
         if default is not None:
             return self.__cast_type(default)
+        if self.default is not None:
+            return self.__cast_type(self.default)
         if self.required:
             raise ValueError("Environment variable %s is required "
                              "to be passed a value", self.title)
