@@ -13,7 +13,7 @@ class Env:
         try:
             return self.variables[title]
         except KeyError:
-            return None
+            raise ValueError("Variable %s is not set" % title)
 
     def __setitem__(self, title, value):
         try:
@@ -28,7 +28,7 @@ class Env:
         try:
             return self[title].value
         except AttributeError:
-            raise ValueError("Variable %s is not set" % title)
+            return None
 
     def __get_config(self, path_to_config):
         return os.path.join(
