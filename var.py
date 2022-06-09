@@ -65,7 +65,7 @@ class Var:
             type_ = getattr(builtins, self.type)
             return type_(value)
         except (ValueError, TypeError):
-            raise ValueError("Can't cast %s %s to type %s" % (value, type(value), self.type))
+            raise ValueError("Can't cast ENV: %s=%s (type: %s) to type %s" % (self.title, value, type(value), self.type))
 
     def __get_description(self, obj):
         return obj.get('description')

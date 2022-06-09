@@ -28,7 +28,8 @@ class Env:
         try:
             return self[title].value
         except AttributeError:
-            return None
+            raise ValueError("Variable %s is not defined."
+                    % title)
 
     def __get_config(self, path_to_config):
         return os.path.join(
