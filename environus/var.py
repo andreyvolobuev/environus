@@ -6,23 +6,22 @@ from datetime import datetime
 
 class Var:
     __slots__ = (
-        'title', 'required', 'type', 'default',
-        'description', 'verbose', 'added_at'
+        'title', 'required', 'type', 'default', 'examples',
+        'description', 'verbose', 'added_at', 'group'
     )
 
     def __init__(self, *args, **kwargs):
         obj = self.__get_obj(*args, **kwargs)
-
         self.title = self.__get_title(obj)
         self.required = self.__get_required(obj)
         self.type = self.__get_type(obj)
         self.default = self.__get_default(obj)
+        self.examples = self.__get_examples(obj)
         self.description = self.__get_description(obj)
         self.verbose = self.__get_verbose(obj)
         self.added_at = self.__get_milestone(obj)
-
+        self.group = self.__get_group(obj)
         self.value
-        self.__log()
 
     def __get_obj(self, *args, **kwargs):
         if args:
@@ -33,11 +32,15 @@ class Var:
                     except TypeError:
                         obj = args[0]
                 else:
-                    raise ValueError("Only one abject as a positional argument "
-                                     "can be accepted")
+                    raise ValueError(
+                        "Only one abject as a positional "
+                        "argument can be accepted"
+                    )
             else:
-                raise ValueError("Either positional or keyword arguments can be "
-                                 "passed, not both")
+                raise ValueError(
+                    "Either positional or keyword "
+                    "arguments can be passed, not both"
+                )
         elif kwargs:
             obj = kwargs
         return obj
@@ -45,7 +48,9 @@ class Var:
     def __get_title(self, obj):
         title = obj.get('title')
         if not title:
-            raise ValueError("Environment variables have to have a title")
+            raise ValueError(
+                "Environment variables have to have a title"
+            )
         return title
 
     def __get_required(self, obj):
@@ -72,11 +77,16 @@ class Var:
                 return self.__bool_cast(value)
             return type_(value)
         except (ValueError, TypeError):
-            raise ValueError("Can't cast ENV: %s = %s (type: %s) to type %s"
-                    % (self.title, value, type(value), self.type))
+            raise ValueError(
+                "Can't cast ENV: %s = %s (type: %s) to type %s"
+                % (self.title, value, type(value), self.type)
+            )
 
     def __get_description(self, obj):
         return obj.get('description')
+
+    def __get_examples(self, obj):
+        return obj.get('examples', [])
 
     def __get_verbose(self, obj):
         return obj.get('verbose', True)
@@ -84,12 +94,15 @@ class Var:
     def __get_milestone(self, obj):
         return obj.get('added_at', datetime.now().timestamp())
 
-    def __log(self):
+    def __get_group(self, obj):
+        return obj.get('group', [])
+
+    def log(self):
         if self.verbose and self.description is None:
             print('[%s] ENV WARNING: %s is not described! '
                   'If you wish to mute this warning - set "verbose" property to False '
-                  'or give the variable a description.' % (
-                  datetime.now().isoformat().replace("T", " "), self.title))
+                  'or give the variable a description.' %
+                  (datetime.now().isoformat().replace("T", " "), self.title))
 
     def to_dict(self):
         obj = {}
@@ -106,8 +119,10 @@ class Var:
         if self.default is not None:
             return self.__cast_type(self.default)
         if self.required:
-            raise ValueError("Environment variable %s is required "
-                             "to be passed a value", self.title)
+            raise ValueError(
+                "Environment variable %s is required "
+                "to be passed a value" % self.title
+            )
         return None
 
     @property
